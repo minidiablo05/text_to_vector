@@ -19,10 +19,10 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
     }
 
     @Override
-    public void saveToVectorSpace(String patientName, String historyText) {
+    public void saveToVectorSpace(String patientId, String historyText) {
         Document document = new Document(
                 historyText,
-                Map.of("patientName", patientName)
+                Map.of("patientId", patientId)
         );
 
         vectorStore.add(List.of(document));
@@ -40,12 +40,12 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
 
         return results.stream()
                 .map(doc -> {
-                    String patientId = String.valueOf(
-                            doc.getMetadata().getOrDefault("patientName", "unknown")
+                    String patientID = String.valueOf(
+                            doc.getMetadata().getOrDefault("patientId", "unknown")
                     );
                     String text = doc.getText() == null ? "" : doc.getText();
 
-                    return "IDX: " + patientId + "\nNote: " + text;
+                    return "IDX: " + patientID + "\nNote: " + text;
                 })
                 .toList();
     }

@@ -24,7 +24,7 @@ spring:
           model: llama3.2
       embedding:
         options:
-          model: mxbai-embed-large
+          model: nomic-embed-text
 
     vectorstore:
       chroma:

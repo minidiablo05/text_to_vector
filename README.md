@@ -1,14 +1,6 @@
 🧠 Medical Multimodal AI Application
 
 
-
-Ссылка на данные используемые в проекте:
-
-https://openneuro.org/datasets/ds007394/versions/1.0.0/file-display/sub-11:anat:sub-11_acq-MPRAGE_T1w.nii.gz
-https://openneuro.org/datasets/ds007394/versions/1.0.0/file-display/sub-11:fmap:sub-11_acq-mb8_dir-ap_epi.nii.gz
-
-
-
 📌 Описание проекта
 Данное приложение представляет собой backend-систему для обработки мультимодальных медицинских данных, реализованную на основе:
 Spring Boot
@@ -64,8 +56,8 @@ Java 21
 Spring Boot
 Spring AI
 Ollama
-PostgreSQL + pgvector
-Gradle
+Chroma
+Maven
 ---
 
 
@@ -78,28 +70,15 @@ Ollama
 
 2. Клонирование
 ```bash
-git clone https://github.com/AlexeyLitovchenko/med_project.git
-cd med_project
+git clone https://github.com/minidiablo05/text_to_vector.git
+cd text_to_vector
 ```
 ---
 
-3. PostgreSQL + pgvector
+3. Chroma
 ```bash
-docker run -d \
-  --name pgvector-db \
-  -p 5432:5432 \
-  -e POSTGRES_DB=medvec \
-  -e POSTGRES_USER=med \
-  -e POSTGRES_PASSWORD=med \
-  ankane/pgvector
+docker run -v ./chroma-data:/data -p 8000:8000 chromadb/chroma
 ```
-```bash
-docker exec -it pgvector-db psql -U med -d medvec
-```
-```sql
-CREATE EXTENSION IF NOT EXISTS vector;
-```
----
 
 4. Ollama
 ```bash
@@ -107,7 +86,7 @@ ollama serve
 ```
 В новом терминале:
 ```bash
-ollama pull qwen2.5:7b
+ollama pull llama3.2
 ollama pull nomic-embed-text
 ```
 ---
@@ -115,26 +94,39 @@ ollama pull nomic-embed-text
 5. Конфигурация
 ```yaml
 spring:
-  datasource:
-    url: jdbc:postgresql://localhost:5432/medvec
-    username: med
-    password: med
-
   servlet:
     multipart:
-      max-file-size: 512MB
-      max-request-size: 512MB
+      max-file-size: 50MB
+      max-request-size: 50MB
 
   ai:
+    model:
+      chat: ollama
+      embedding: ollama
+
     ollama:
       base-url: http://localhost:11434
+      chat:
+        options:
+          model: llama3.2
+      embedding:
+        options:
+          model: nomic-embed-text
+
+    vectorstore:
+      chroma:
+        client:
+          host: http://localhost
+          port: 8000
+        collection-name: my_collection
+        initialize-schema: true
 ```
 ---
 
-6. MRI файлы
+6. Файлы с данными.
 ```
-data/sub-1_T1w.nii.gz
-data/sub-1_FLAIR.nii.gz
+data/augmented_notes_50.jsonl
+
 ```
 ---
 7. Запуск
@@ -143,21 +135,20 @@ data/sub-1_FLAIR.nii.gz
 ```
 ---
 
-8. Ingest
+8. Ingest file
 ```bash
-curl -X POST "http://localhost:8080/api/ingest" \
-  -F patientId=sub-1 \
-  -F modality=MRI \
-  -F sourceName=sub-1_T1w.nii.gz \
-  -F file=@data/sub-1_T1w.nii.gz
+curl -X POST "http://localhost:8080/api/ingest" 
+   -F dataset=augmented-clinical-notes 
+   -F sourceName=augmented_notes_50.jsonl 
+   -F file=@"data\augmented_notes_50.jsonl"
+
 ```
 ---
 
 9. QA
 ```bash
-curl -X POST "http://localhost:8080/api/qa" \
-  -H "Content-Type: application/json" \
-  -d '{"question":"Какие MRI-данные загружены для пациента sub-1?"}'
+curl --get "http://localhost:8080/api/records/search" \
+  --data-urlencode "query=neck pain headache"
 ```
 ---
 

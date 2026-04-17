@@ -18,8 +18,8 @@ public class MedicalRecordController {
 
     @PostMapping("/save")
     public String saveRecord(@RequestBody MedicalRecordDTO dto) {
-        service.saveToVectorSpace(dto.patientName(), dto.historyText());
-        return "История болезни пациента " + dto.patientName() + " успешно векторизована и сохранена!";
+        service.saveToVectorSpace(dto.patientId(), dto.historyText());
+        return "История болезни пациента " + dto.patientId() + " успешно векторизована и сохранена!";
     }
 
     @GetMapping("/search")
