@@ -30,7 +30,7 @@
 - `MedicalRecordService` — интерфейс бизнес-логики;
 - `MedicalRecordServiceImpl` — реализация логики сохранения и поиска;
 - `DatasetIngestController` — контроллер для загрузки датасета;
-- `DatasetIngestService` и `DatasetIngestServiceImpl` — сервис для загрузки CSV-файлов и массового добавления записей.
+- `DatasetIngestService` и `DatasetIngestServiceImpl` — сервис для загрузки JSONL-файлов и массового добавления записей.
 
 ## Возможности
 
