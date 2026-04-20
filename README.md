@@ -116,16 +116,12 @@ data/augmented_notes_50.jsonl
 
 8. Ingest file
 ```bash
-curl -X POST "http://localhost:8080/api/ingest" 
-   -F dataset=augmented-clinical-notes 
-   -F sourceName=augmented_notes_50.jsonl 
-   -F file=@"data\augmented_notes_50.jsonl"
+curl -X POST "http://localhost:8080/api/ingest" -F dataset=augmented-clinical-notes -F sourceName=augmented_notes_50.jsonl -F file=@"data\augmented_notes_50.jsonl"
 
 ```
 ---
 
 9. QA
 ```bash
-curl --get "http://localhost:8080/api/records/search" \
-  --data-urlencode "query=neck pain headache"
+curl --get "http://localhost:8080/api/records/search" --data-urlencode "query=neck pain headache"
 ```
