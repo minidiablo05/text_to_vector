@@ -110,7 +110,7 @@ data/augmented_notes_50.jsonl
 ---
 7. Запуск
 ```bash
-./gradlew bootRun
+./mvnw spring-boot:run
 ```
 ---
 
