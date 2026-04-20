@@ -19,34 +19,42 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
     }
 
     @Override
-    public void saveToVectorSpace(String patientId, String historyText) {
-        Document document = new Document(
-                historyText,
-                Map.of("patientId", patientId)
-        );
+    public void saveToVectorSpace(String patientName, String historyText) {
+        try {
+            Document document = new Document(
+                    historyText,
+                    Map.of("patientName", patientName)
+            );
 
-        vectorStore.add(List.of(document));
+            vectorStore.add(List.of(document));
+        } catch (Exception e) {
+            throw new RuntimeException("Ошибка при сохранении записи в векторное хранилище", e);
+        }
     }
 
     @Override
     public List<String> findSimilar(String query) {
-        SearchRequest request = SearchRequest.builder()
-                .query(query)
-                .topK(5)
-                .similarityThreshold(0.5)
-                .build();
+        try {
+            SearchRequest request = SearchRequest.builder()
+                    .query(query)
+                    .topK(5)
+                    .similarityThreshold(0.5)
+                    .build();
 
-        List<Document> results = vectorStore.similaritySearch(request);
+            List<Document> results = vectorStore.similaritySearch(request);
 
-        return results.stream()
-                .map(doc -> {
-                    String patientID = String.valueOf(
-                            doc.getMetadata().getOrDefault("patientId", "unknown")
-                    );
-                    String text = doc.getText() == null ? "" : doc.getText();
+            return results.stream()
+                    .map(doc -> {
+                        String patientName = String.valueOf(
+                                doc.getMetadata().getOrDefault("patientName", "Unknown Patient")
+                        );
+                        String text = doc.getText() == null ? "" : doc.getText();
 
-                    return "IDX: " + patientID + "\nNote: " + text;
-                })
-                .toList();
+                        return "Пациент: " + patientName + "\nИстория: " + text;
+                    })
+                    .toList();
+        } catch (Exception e) {
+            throw new RuntimeException("Ошибка при поиске похожих записей", e);
+        }
     }
 }

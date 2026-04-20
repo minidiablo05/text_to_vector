@@ -73,6 +73,3 @@ out/
 .gradle/
 .idea/
 
-data/
-*.nii
-*.nii.gz
